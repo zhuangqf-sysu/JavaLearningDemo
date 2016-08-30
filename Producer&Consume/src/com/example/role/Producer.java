@@ -23,7 +23,7 @@ public class Producer implements Runnable {
             try{
                 Integer n = new Random().nextInt();
 
-                Method method = buffer.getMethod("product",Integer.TYPE);
+                Method method = buffer.getMethod("product",Integer.class);
                 method.invoke(null,n);
 
                 System.out.println(
