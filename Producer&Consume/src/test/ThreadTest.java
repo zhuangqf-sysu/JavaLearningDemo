@@ -1,8 +1,8 @@
 package test;
 
+import com.example.buffer.BlockingQueueProduceBuffer;
 import com.example.buffer.LockProduceBuffer;
 import com.example.role.Consumer;
-import com.example.buffer.BlockingQueueProduceBuffer;
 import com.example.role.Producer;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by zq on 2016/8/30.
  */
-public class Test {
+public class ThreadTest {
 
     private final static Boolean PRODUCER = true;
     private final static Boolean CONSUMER = false;
@@ -32,6 +32,7 @@ public class Test {
         join();
     }
 
+    //等待所有线程退出
     private static void join() {
         try {
             for (Thread thread : threads)
@@ -41,14 +42,15 @@ public class Test {
         }
     }
 
+    //生产快于消费
     private static void test1(Class buffer) {
-        //生产快于消费
         addThread(PRODUCER, 5, buffer);
         addThread(CONSUMER, 10, buffer);
         addThread(PRODUCER, 5, buffer);
     }
+
+    //消费快于生产
     private static void test2(Class buffer){
-        //消费快于生产
         addThread(PRODUCER,10,buffer);
         addThread(CONSUMER,5,buffer);
         addThread(CONSUMER,5,buffer);
@@ -56,11 +58,14 @@ public class Test {
 
     private static void addThread(Boolean flag,int n,Class buffer){
         Thread thread;
+
         if(PRODUCER.equals(flag))
             thread = new Thread(new Producer(n,buffer));
         else thread = new Thread(new Consumer(n,buffer));
+
         thread.start();
         threads.add(thread);
+
         try {
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
