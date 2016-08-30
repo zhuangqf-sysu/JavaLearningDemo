@@ -1,5 +1,6 @@
 package test;
 
+import com.example.buffer.LockProduceBuffer;
 import com.example.role.Consumer;
 import com.example.buffer.BlockingQueueProduceBuffer;
 import com.example.role.Producer;
@@ -21,7 +22,13 @@ public class Test {
     public static void main(String[] arg){
 
         threads = new ArrayList<Thread>();
-        testBlockingQueueProduceBuffer();
+
+//        test1(BlockingQueueProduceBuffer.class);
+//        test2(BlockingQueueProduceBuffer.class);
+
+//        test1(LockProduceBuffer.class);
+//        test2(LockProduceBuffer.class);
+
         join();
     }
 
@@ -34,16 +41,17 @@ public class Test {
         }
     }
 
-    private static void testBlockingQueueProduceBuffer() {
+    private static void test1(Class buffer) {
         //生产快于消费
-        addThread(PRODUCER,5,BlockingQueueProduceBuffer.class);
-        addThread(CONSUMER,10,BlockingQueueProduceBuffer.class);
-        addThread(PRODUCER,5,BlockingQueueProduceBuffer.class);
-
+        addThread(PRODUCER, 5, buffer);
+        addThread(CONSUMER, 10, buffer);
+        addThread(PRODUCER, 5, buffer);
+    }
+    private static void test2(Class buffer){
         //消费快于生产
-        addThread(PRODUCER,10,BlockingQueueProduceBuffer.class);
-        addThread(CONSUMER,5,BlockingQueueProduceBuffer.class);
-        addThread(CONSUMER,5,BlockingQueueProduceBuffer.class);
+        addThread(PRODUCER,10,buffer);
+        addThread(CONSUMER,5,buffer);
+        addThread(CONSUMER,5,buffer);
     }
 
     private static void addThread(Boolean flag,int n,Class buffer){
