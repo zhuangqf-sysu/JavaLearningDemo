@@ -1,18 +1,21 @@
 package com.example.client;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.concurrent.SynchronousQueue;
 
 /**
  * Created by zq on 2016/8/31.
  */
 public class Client {
+
+    private static Socket socket;
+
     public static void main(String[] arg){
-        Socket socket = new Socket();
+        socket = new Socket();
         try {
             socket.setSoTimeout(100000);
             socket.connect(
@@ -21,23 +24,15 @@ public class Client {
                 System.out.println("not connect");
                 return;
             }
-            PrintWriter output = new PrintWriter(socket.getOutputStream());
-            Scanner scaner1 = new Scanner(socket.getInputStream());
-            Scanner scaner2 = new Scanner(System.in);
 
-            String a = "hello world";
-            while(socket.isConnected()){
-                if(scaner1.hasNext()){
-                    a = scaner1.nextLine();
-                    System.out.print(a);
-                }
-                if(scaner2.hasNext()){
-                    a = scaner2.nextLine();
-                    output.println(a);
-                    output.flush();
-                }
-                if(a.contains("exit")) break;
-            }
+            Sender sender1 = new Sender(socket.getInputStream(),System.out);
+            Sender sender2 = new Sender(System.in,socket.getOutputStream());
+
+            new Thread(sender1).start();
+            new Thread(sender2).start();
+
+            while(socket.isConnected());
+
         } catch (IOException e) {
             e.printStackTrace();
         }finally {
@@ -48,4 +43,26 @@ public class Client {
             }
         }
     }
+
+    private static class Sender implements Runnable{
+
+        private Scanner input;
+        private PrintWriter output;
+
+        public Sender(InputStream input,OutputStream output){
+            this.input = new Scanner(input);
+            this.output = new PrintWriter(output);
+        }
+
+        @Override
+        public void run() {
+            while(socket.isConnected()){
+                if(input.hasNext()){
+                    output.println(input.nextLine());
+                    output.flush();
+                }
+            }
+        }
+    }
+
 }

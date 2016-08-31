@@ -1,21 +1,25 @@
 package com.example.server;
 
+import com.sun.imageio.spi.RAFImageInputStreamSpi;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
 
 /**
  * Created by zq on 2016/8/31.
  */
-public class InfoCheckThread implements Runnable{
+public class ClientThread implements Runnable{
 
     private Socket socket;
     private Scanner input;
     private PrintWriter output;
     private String name;
     private String password;
+    private int messageCount = 0;
 
-    public InfoCheckThread(Socket socket) {
+    public ClientThread(Socket socket) {
         this.socket = socket;
         try {
             this.input = new Scanner(socket.getInputStream());
@@ -27,7 +31,6 @@ public class InfoCheckThread implements Runnable{
 
     @Override
     public void run() {
-
         output.println("Input your name:");
         output.flush();
         name = input.nextLine();
@@ -39,10 +42,35 @@ public class InfoCheckThread implements Runnable{
         if(password==null){
             output.println("error password!");
             output.flush();
+            closeSocket();
         }else {
-            output.print("your name:" + name + " ");
-            output.println("your password:" + password + "\n");
+            output.println("welcome "+ name);
             output.flush();
+            chat();
+        }
+    }
+
+    private void chat() {
+        String m = "hello world";
+        System.out.println(m+" "+name);
+
+        new Thread(() -> {
+            while(true){
+                while(messageCount < MessageInfo.getCount()){
+                    output.println(MessageInfo.getMessage(messageCount));
+                    output.flush();
+                    messageCount++;
+                }
+            }
+        }).start();
+
+        while(!m.contains("exit")){
+            if(input.hasNext()){
+                m = input.nextLine();
+                System.out.println(m);
+                MessageInfo.addMessageInfo(name,m);
+                System.out.println(MessageInfo.getMessage(MessageInfo.getCount()-1));
+            }
         }
         closeSocket();
     }
@@ -59,7 +87,6 @@ public class InfoCheckThread implements Runnable{
             System.out.println(name + " exit!");
         }
     }
-
 
     private String checkPassword(ClientInfo clientInfo) {
         output.println("Input your password:");
@@ -81,4 +108,5 @@ public class InfoCheckThread implements Runnable{
         new ClientInfo(name,password1);
         return password1;
     }
+
 }
