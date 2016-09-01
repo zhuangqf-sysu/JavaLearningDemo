@@ -4,7 +4,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/JavaLearningDemo.iml" filepath="$PROJECT_DIR$/JavaLearningDemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/Producer&amp;Consume/Producer&amp;Consume.iml" filepath="$PROJECT_DIR$/Producer&amp;Consume/Producer&amp;Consume.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Reflection&amp;Annotation/Reflection&amp;Aninotation.iml" filepath="$PROJECT_DIR$/Reflection&amp;Annotation/Reflection&amp;Aninotation.iml" />
       <module fileurl="file://$PROJECT_DIR$/Socket/Socket.iml" filepath="$PROJECT_DIR$/Socket/Socket.iml" />
+      <module fileurl="file://$PROJECT_DIR$/test/test.iml" filepath="$PROJECT_DIR$/test/test.iml" />
     </modules>
   </component>
 </project>
