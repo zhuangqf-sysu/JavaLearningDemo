@@ -1,11 +1,8 @@
 package com.example.server;
 
-import com.sun.imageio.spi.RAFImageInputStreamSpi;
-
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
-import java.util.concurrent.Callable;
 
 /**
  * Created by zq on 2016/8/31.
@@ -40,7 +37,7 @@ public class ClientThread implements Runnable{
         else password = checkPassword(clientInfo);
 
         if(password==null){
-            output.println("error password!");
+            output.println("quit now! Error password!");
             output.flush();
             closeSocket();
         }else {
@@ -51,8 +48,9 @@ public class ClientThread implements Runnable{
     }
 
     private void chat() {
-        String m = "hello world";
-        System.out.println(m+" "+name);
+        String m;
+        MessageInfo.addMessageInfo("System",name+" join!");
+        System.out.println(MessageInfo.getMessage(MessageInfo.getCount()-1));
 
         new Thread(() -> {
             while(true){
@@ -64,12 +62,12 @@ public class ClientThread implements Runnable{
             }
         }).start();
 
-        while(!m.contains("exit")){
+        while(true){
             if(input.hasNext()){
                 m = input.nextLine();
                 System.out.println(m);
-                MessageInfo.addMessageInfo(name,m);
-                System.out.println(MessageInfo.getMessage(MessageInfo.getCount()-1));
+                if(m.contains("quit")) break;
+                else MessageInfo.addMessageInfo(name,m);
             }
         }
         closeSocket();
@@ -84,7 +82,8 @@ public class ClientThread implements Runnable{
             e.printStackTrace();
         }
         if(socket.isClosed()){
-            System.out.println(name + " exit!");
+            MessageInfo.addMessageInfo("System",name+" exit!");
+            System.out.println(MessageInfo.getMessage(MessageInfo.getCount()-1));
         }
     }
 
@@ -101,7 +100,7 @@ public class ClientThread implements Runnable{
         output.println("Input your password:");
         output.flush();
         String password1 = input.nextLine();
-        output.println("Input your password again:");
+        output.println("confirm your password:");
         output.flush();
         String password2 = input.nextLine();
         if(!password1.equals(password2)) return null;

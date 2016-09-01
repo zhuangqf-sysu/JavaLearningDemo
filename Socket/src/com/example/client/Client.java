@@ -5,7 +5,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Scanner;
-import java.util.concurrent.SynchronousQueue;
 
 /**
  * Created by zq on 2016/8/31.
@@ -13,8 +12,9 @@ import java.util.concurrent.SynchronousQueue;
 public class Client {
 
     private static Socket socket;
+    private static boolean isShutdown = false;
 
-    public static void main(String[] arg){
+    public static void main(String[] arg) throws InterruptedException {
         socket = new Socket();
         try {
             socket.setSoTimeout(100000);
@@ -28,10 +28,14 @@ public class Client {
             Sender sender1 = new Sender(socket.getInputStream(),System.out);
             Sender sender2 = new Sender(System.in,socket.getOutputStream());
 
-            new Thread(sender1).start();
-            new Thread(sender2).start();
+            Thread thread1 = new Thread(sender1);
+            Thread thread2 = new Thread(sender2);
 
-            while(socket.isConnected());
+            thread1.start();
+            thread2.start();
+
+            thread1.join();
+            thread2.join();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -56,10 +60,15 @@ public class Client {
 
         @Override
         public void run() {
-            while(socket.isConnected()){
+            while(socket.isConnected()&&!isShutdown){
                 if(input.hasNext()){
-                    output.println(input.nextLine());
+                    String message = input.nextLine();
+                    output.println(message);
                     output.flush();
+                    if(message.indexOf("quit")!=-1){
+                        isShutdown = true;
+                        break;
+                    }
                 }
             }
         }
