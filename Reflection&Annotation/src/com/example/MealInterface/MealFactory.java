@@ -1,4 +1,4 @@
-package com.example.Order;
+package com.example.MealInterface;
 
 import com.example.MealInterface.Meal;
 import com.example.MealInterface.MealAnnotation;
